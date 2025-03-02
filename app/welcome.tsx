@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BlurView } from 'expo-blur';
 import Animated, { FadeIn, FadeInUp, FadeOut, SlideInUp } from 'react-native-reanimated';
+import Marquee from '~/components/Marquee';
 
 const EVENTS = [
   {
@@ -62,13 +63,7 @@ const WelcomeScreen = () => {
           <Animated.View
             className="mt-20 h-3/5 w-full"
             entering={SlideInUp.springify().mass(1).damping(30)}>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              {EVENTS.map((event) => (
-                <View className="h-full w-96 p-5" key={event.id}>
-                  <Image source={event.image} className="h-full w-full rounded-3xl " />
-                </View>
-              ))}
-            </ScrollView>
+            <Marquee EVENTS={EVENTS} />
           </Animated.View>
 
           <View className="flex-1 justify-center gap-4  p-4">
