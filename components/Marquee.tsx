@@ -1,9 +1,11 @@
 import { View, Image, ScrollView, useWindowDimensions } from 'react-native';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Animated, {
   Easing,
   interpolate,
+  runOnJS,
   SharedValue,
+  useAnimatedReaction,
   useAnimatedStyle,
   useFrameCallback,
   useSharedValue,
@@ -45,10 +47,17 @@ function MarqueeItem({ EVENT, index, scroll, containerWidth, itemWidth }: Marque
   );
 }
 
-const Marquee = ({ EVENTS }: { EVENTS: any[] }) => {
+const Marquee = ({
+  EVENTS,
+  onIndexChange,
+}: {
+  EVENTS: any[];
+  onIndexChange?: (index: number) => void;
+}) => {
   const scroll = useSharedValue(0);
   const scrollSpeed = useSharedValue(50); // pixels per frame
   const { width: SCREEN_WIDTH } = useWindowDimensions();
+  const [activeIndex, setActiveIndex] = useState(0);
   const itemWidth = SCREEN_WIDTH * 0.65;
 
   const containerWidth = EVENTS.length * itemWidth;
@@ -56,6 +65,20 @@ const Marquee = ({ EVENTS }: { EVENTS: any[] }) => {
     const delta = (timeSincePreviousFrame ?? 0) / 1000;
     scroll.value = scroll.value + scrollSpeed.value * delta;
   });
+
+  useEffect(() => {
+    if (onIndexChange) {
+      onIndexChange(activeIndex);
+    }
+  }, [activeIndex]);
+  useAnimatedReaction(
+    () => scroll.value,
+    (value) => {
+      const normalizedValue = (value + SCREEN_WIDTH / 2) % containerWidth;
+      const activeIndex = Math.floor(normalizedValue / itemWidth);
+      runOnJS(setActiveIndex)(activeIndex);
+    }
+  );
   const gesture = Gesture.Pan()
     .onBegin(() => {
       scrollSpeed.value = 0;

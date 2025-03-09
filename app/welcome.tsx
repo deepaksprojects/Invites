@@ -39,13 +39,13 @@ const EVENTS = [
     image: require('../assets/images/8.jpg'),
   },
 ];
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 const WelcomeScreen = () => {
   const [currentEvent, setCurrentEvent] = useState(0);
   function handleActiveEvent() {
     setCurrentEvent(currentEvent >= EVENTS.length - 1 ? 0 : currentEvent + 1);
   }
-  const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
   return (
     <View className="flex-1 items-center">
       <Animated.Image
@@ -61,9 +61,9 @@ const WelcomeScreen = () => {
         <SafeAreaView edges={['bottom']}>
           {/* Top Part Of Screen */}
           <Animated.View
-            className="mt-20 h-3/5 w-full"
+            className="mt-20 h-1/2 w-full"
             entering={SlideInUp.springify().mass(1).damping(30)}>
-            <Marquee EVENTS={EVENTS} />
+            <Marquee EVENTS={EVENTS} onIndexChange={setCurrentEvent} />
           </Animated.View>
 
           <View className="flex-1 justify-center gap-4  p-4">
@@ -84,7 +84,7 @@ const WelcomeScreen = () => {
               facere similique eos ex sunt at quam inventore, sit adipisci
             </Animated.Text>
             <AnimatedPressable
-              onPress={handleActiveEvent}
+              // onPress={handleActiveEvent}
               entering={FadeInUp.springify().mass(1).damping(30).delay(500)}
               className="items-center self-center rounded-full bg-white px-10 py-4">
               <Text className="text-lg">Create an event</Text>
