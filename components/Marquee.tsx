@@ -2,6 +2,7 @@ import { View, Image, ScrollView, useWindowDimensions } from 'react-native';
 import React from 'react';
 import Animated, {
   Easing,
+  interpolate,
   SharedValue,
   useAnimatedStyle,
   useFrameCallback,
@@ -23,16 +24,23 @@ function MarqueeItem({ EVENT, index, scroll, containerWidth, itemWidth }: Marque
   const initialPosition = index * itemWidth - shift;
   const animatedStyle = useAnimatedStyle(() => {
     const position = ((initialPosition - scroll.value) % containerWidth) + shift;
+    const rotation = interpolate(position, [0, SCREEN_WIDTH - itemWidth], [-1, 1]);
+    const translateY = interpolate(
+      position,
+      [0, (SCREEN_WIDTH - itemWidth) / 2, SCREEN_WIDTH - itemWidth],
+      [2, 0, 2]
+    );
     return {
       left: position,
+      transform: [{ rotate: `${rotation}deg` }, { translateY }],
     };
   });
   return (
     <Animated.View
-      className="absolute h-full w-96  p-3 shadow-md"
+      className="absolute h-full w-96  p-2 shadow-md"
       key={EVENT.id}
-      style={[{ width: itemWidth }, animatedStyle]}>
-      <Image source={EVENT.image} className="h-full w-full rounded-3xl " />
+      style={[{ width: itemWidth, transformOrigin: 'bottom' }, animatedStyle]}>
+      <Image source={EVENT.image} className="h-full w-full rounded-3xl " resizeMode="cover" />
     </Animated.View>
   );
 }
