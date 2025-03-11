@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { BlurView } from 'expo-blur';
 import Animated, { FadeIn, FadeInUp, FadeOut, SlideInUp } from 'react-native-reanimated';
 import Marquee from '~/components/Marquee';
+import EventCard from '~/components/EventCard';
 
 const EVENTS = [
   {
@@ -46,6 +47,10 @@ const WelcomeScreen = () => {
   function handleActiveEvent() {
     setCurrentEvent(currentEvent >= EVENTS.length - 1 ? 0 : currentEvent + 1);
   }
+
+  function renderItem({ event }: { event: any }) {
+    return <EventCard event={event} />;
+  }
   return (
     <View className="flex-1 items-center">
       <Animated.Image
@@ -63,7 +68,7 @@ const WelcomeScreen = () => {
           <Animated.View
             className="mt-20 h-1/2 w-full"
             entering={SlideInUp.springify().mass(1).damping(30)}>
-            <Marquee EVENTS={EVENTS} onIndexChange={setCurrentEvent} />
+            <Marquee EVENTS={EVENTS} onIndexChange={setCurrentEvent} renderItem={renderItem} />
           </Animated.View>
 
           <View className="flex-1 justify-center gap-4  p-4">

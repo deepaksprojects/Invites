@@ -1,5 +1,5 @@
 import { View, Image, ScrollView, useWindowDimensions } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, { Children, PropsWithChildren, useEffect, useState } from 'react';
 import Animated, {
   Easing,
   interpolate,
@@ -13,14 +13,19 @@ import Animated, {
 } from 'react-native-reanimated';
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 type MarqueeItemProps = {
-  EVENT: any;
   index: number;
   scroll: SharedValue<number>;
   containerWidth: number;
   itemWidth: number;
 };
 
-function MarqueeItem({ EVENT, index, scroll, containerWidth, itemWidth }: MarqueeItemProps) {
+function MarqueeItem({
+  index,
+  scroll,
+  containerWidth,
+  itemWidth,
+  children,
+}: PropsWithChildren<MarqueeItemProps>) {
   const { width: SCREEN_WIDTH } = useWindowDimensions();
   const shift = (containerWidth - SCREEN_WIDTH) / 2;
   const initialPosition = index * itemWidth - shift;
@@ -40,9 +45,8 @@ function MarqueeItem({ EVENT, index, scroll, containerWidth, itemWidth }: Marque
   return (
     <Animated.View
       className="absolute h-full w-96  p-2 shadow-md"
-      key={EVENT.id}
       style={[{ width: itemWidth, transformOrigin: 'bottom' }, animatedStyle]}>
-      <Image source={EVENT.image} className="h-full w-full rounded-3xl " resizeMode="cover" />
+      {children}
     </Animated.View>
   );
 }
@@ -50,9 +54,11 @@ function MarqueeItem({ EVENT, index, scroll, containerWidth, itemWidth }: Marque
 const Marquee = ({
   EVENTS,
   onIndexChange,
+  renderItem,
 }: {
   EVENTS: any[];
   onIndexChange?: (index: number) => void;
+  renderItem: (item: any) => React.ReactNode;
 }) => {
   const scroll = useSharedValue(0);
   const scrollSpeed = useSharedValue(50); // pixels per frame
@@ -96,12 +102,12 @@ const Marquee = ({
         {EVENTS.map((event, index) => (
           <MarqueeItem
             key={event.id}
-            EVENT={event}
             index={index}
             scroll={scroll}
             containerWidth={containerWidth}
-            itemWidth={itemWidth}
-          />
+            itemWidth={itemWidth}>
+            {renderItem({ event, index })}
+          </MarqueeItem>
         ))}
       </View>
     </GestureDetector>
