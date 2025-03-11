@@ -30,7 +30,9 @@ function MarqueeItem({
   const shift = (containerWidth - SCREEN_WIDTH) / 2;
   const initialPosition = index * itemWidth - shift;
   const animatedStyle = useAnimatedStyle(() => {
-    const position = ((initialPosition - scroll.value) % containerWidth) + shift;
+    const position =
+      ((((initialPosition - scroll.value) % containerWidth) + containerWidth) % containerWidth) -
+      shift;
     const rotation = interpolate(position, [0, SCREEN_WIDTH - itemWidth], [-1, 1]);
     const translateY = interpolate(
       position,
@@ -70,6 +72,9 @@ const Marquee = ({
   useFrameCallback(({ timeSincePreviousFrame }) => {
     const delta = (timeSincePreviousFrame ?? 0) / 1000;
     scroll.value = scroll.value + scrollSpeed.value * delta;
+    if (scroll.value < 0) {
+      scroll.value += containerWidth;
+    }
   });
 
   useEffect(() => {
@@ -91,6 +96,7 @@ const Marquee = ({
     })
     .onChange((event) => {
       scrollSpeed.value = scrollSpeed.value - event.changeX;
+      scroll.value -= event.changeX;
     })
     .onFinalize(({ velocityX }) => {
       scrollSpeed.value = -velocityX;
